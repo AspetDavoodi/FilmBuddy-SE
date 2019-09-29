@@ -15,7 +15,147 @@ class Rolls:
         Rolls.ChooseMode()
 
     def AddRoll(self):
-        pass
+        def brandChoice():
+
+            while True:
+                tempBrandChoice = (input("\nPlease input the name of the Brand you would like to add a roll to.\n"))
+
+                brandValidation = Rolls.RollData.get(tempBrandChoice)
+
+                if brandValidation is None:
+                    print("Invalid input, please input the name of the brand you want to select")
+                else:
+                    break
+            return tempBrandChoice
+
+        def ISOWrite():
+            ISORange = int(input("How many ISO's is the roll available in? (input an integer number)"))
+            ISOValues = []
+            for i in range(ISORange):
+                ISO = input("Please write the ISO values of the roll, in increasing order")
+                ISOValues.append(int(ISO))
+            return ISOValues
+
+        def typeWrite():
+
+            while True:
+
+                rollType = input("""
+        Is the film Color? 
+        input:  """)
+                rollType = Rolls.checkAgreement(rollType)
+
+                if rollType.isnumeric() and int(rollType) == 0:
+                    is_Color = False
+                    break
+                elif rollType.isnumeric() and int(rollType) == 1:
+                    is_Color = True
+                    break
+                else:
+                    print("Invalid input! please refer to instructions above to select film type")
+            return is_Color
+
+        def usageWrite():
+            usageValues = []
+            while True:
+                usage = input("""
+        Please write applications for this film, for example:
+        Portraits
+        Street
+        Landscape
+        General
+        Studio
+
+        Afterwards input 0 to end this process
+
+        input:  """)
+                if usage.isnumeric() and int(usage) == 0:
+                    break
+                else:
+                    usageValues.append(usage)
+
+            return usageValues
+
+        def highEndWrite():
+
+            while True:
+                highEndArgument = input("Does one roll of the film cost more than 7 USD?")
+
+                highEndArgument = Rolls.checkAgreement(highEndArgument)
+
+                if highEndArgument.isnumeric() and int(highEndArgument) == 1:
+                    is_HighEnd = True
+                    break
+                elif highEndArgument.isnumeric() and int(highEndArgument) == 0:
+                    is_HighEnd = False
+                    break
+                else:
+                    print("Invalid input, please refer to the instructions above")
+            return is_HighEnd
+
+        def productionWrite():
+
+            while True:
+                productionMode = input("Is this roll currently in production?")
+
+                productionMode = Rolls.checkAgreement(productionMode)
+
+                if productionMode.isnumeric() and int(productionMode) == 1:
+                    is_inProduction = True
+                    break
+                elif productionMode.isnumeric() and int(productionMode) == 0:
+                    is_inProduction = False
+                    break
+                else:
+                    print("Invalid input, please refer to the instructions above")
+            return is_inProduction
+
+        def negOrPos():
+            while True:
+                negorposArg = input("""is the roll negative?(write No if it's Slide)
+        input:""")
+                negorposArg = Rolls.checkAgreement(negorposArg)
+
+                if negorposArg.isnumeric() and int(negorposArg) == 1:
+                    return "Negative"
+                elif negorposArg.isnumeric() and int(negorposArg) == 0:
+                    return "Slide"
+                else:
+                    print("Invalid input, please refer to the instructions above")
+
+        print("""
+        Hello! You are now in Admin mode.
+        Here you can add new rolls of film that you found are missing from the database.
+        Below are the list of Brands that already exist in the database. \n""")
+
+        print(("   \n").join(Rolls.RollData.keys()))
+
+        brandChoice = brandChoice()
+
+        print("Here are the models that already exist for the selected brand:\n", )
+        Rolls.modelsInBrand(brandChoice, Rolls.RollData)
+        modelName = input("What is the name of the roll you'd like to add")
+
+        ISOValues = ISOWrite()
+
+        Color = typeWrite()
+
+        usage = usageWrite()
+
+        highend = highEndWrite()
+
+        type = negOrPos()
+
+        production = productionWrite()
+
+
+
+        RollCreator(brandChoice,modelName,ISOValues,type,usage,highend,Color, production)
+
+        Rolls.RollData[Rolls.BrandtoAddto].append(Rolls.PackedData)
+
+        print ("Roll Added sucessfully!!\n \n")
+
 
     def FindRoll(self):
         print("""Hello! You are now in User Mode!
@@ -223,7 +363,7 @@ class Rolls:
 
                     if modeContinue == 1:
 
-                        Rolls.AddRoll()
+                        Rolls.AddRoll(Rolls)
 
                         pass
 
@@ -283,8 +423,8 @@ class RollCreator(Rolls):
         }
 
         self.BrandtoAddto = self.Brand
-        super.PackedData = self.PackedData
-        super.BrandtoAddto = self.BrandtoAddto
+        Rolls.PackedData = self.PackedData
+        Rolls.BrandtoAddto = self.BrandtoAddto
 
 
 
