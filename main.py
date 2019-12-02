@@ -6,38 +6,56 @@ class RollManager:
 
     def __init__(self):
         self.RollData = {}
-        self.rolls = []
+        self.MaxNumberofBrands = 100
+        self.Hashtable = [None] * self.MaxNumberofBrands
+        self.head = None
+
+
+    def HashFunction(self, key):
+        return key % self.MaxNumberofBrands
+
+    def InsertBrand(self,key,value):
+        hash_key = self.HashFunction(key)
+        self.Hashtable[hash_key] = value
 
     def loadRollDataFromJSON(self):
         with open('RollData.json', 'r') as rolldata:
           self.RollData = js.load(rolldata)
 
         for key in self.RollData:
+
             for rollData in self.RollData[key]:
                 roll = Roll(key, rollData["model"], rollData["ISO"], rollData["type"], rollData["Usage"], rollData["is_HighEnd"], rollData["is_Color"], rollData["is_inProduction"])
-                self.rolls.append(roll)
+                if self.head is None:
+                    self.head = roll.Model
+                else:
+                    last = self.head
+                    while last is not None:
+                        last = roll.next
+                    last.next = roll.Model
 
-    def toJSON(self):
-        saveData = {}
-        for roll in self.rolls:
-            if roll.getBrand() not in saveData.keys():
-                saveData[roll.getBrand()] = []
+    def Appendroll(self,Model):
+        return
 
-            saveData[roll.getBrand()].append(roll.toJSON())
+    def addRolltoBrand(self,brand,modelName):
+        brand = self.HashFunction(brand)
+        self.Hashtable[brand] = self.Appendroll(modelName)
 
-        return saveData
+
+    def deleteRoll(self,brand,model):
+        pass
+
+
 
     def saveJSON(self):
+        pass
 
-        SaveFile = RollManager.toJSON(self)
-        with open('RollData.json', 'W') as writedata:
-            js.dump(SaveFile, writedata, indent=4, separators=(',', ': '))
 
 class Roll:
 
-    def __init__(self, Brand, Name, ISO, type, usage, is_highend, is_color, is_inProduction):
+    def __init__(self, Brand, Model, ISO, type, usage, is_highend, is_color, is_inProduction):
         self.Brand = Brand
-        self.Name = Name
+        self.Model = Model
         self.ISO = ISO
         self.type = type
         self.usage = usage
@@ -45,12 +63,16 @@ class Roll:
         self.is_color = is_color
         self.is_inProduction = is_inProduction
 
+        self.next = None #Linked List implementation made more sense than tree or BST as most rolls have values that coincide
+
+
+
     def getBrand(self):
         return self.Brand
 
     def toJSON(self):
         json = {
-            "model": self.Name,
+            "model": self.Model,
             "ISO": self.ISO,
             "type": self.type,
             "Usage": self.usage,
@@ -67,7 +89,6 @@ def main():
     rolls.loadRollDataFromJSON()
 
     print(rolls)
-    print(rolls.toJSON())
 
 main()
 
