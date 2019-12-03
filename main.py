@@ -12,7 +12,11 @@ class RollManager:
 
 
     def HashFunction(self, key):
-        return key % self.MaxNumberofBrands
+        hashedkey = 0
+        for i in key:
+            hashedkey = hashedkey + ord(i)
+        return hashedkey
+
 
     def InsertBrand(self,key,value):
         hash_key = self.HashFunction(key)
@@ -27,19 +31,18 @@ class RollManager:
             for rollData in self.RollData[key]:
                 roll = Roll(key, rollData["model"], rollData["ISO"], rollData["type"], rollData["Usage"], rollData["is_HighEnd"], rollData["is_Color"], rollData["is_inProduction"])
                 if self.head is None:
-                    self.head = roll.Model
+                    self.head = roll
                 else:
                     last = self.head
                     while last is not None:
                         last = roll.next
-                    last.next = roll.Model
+                    last.next = roll
 
-    def Appendroll(self,Model):
-        return
+                self.addRolltoBrand(key,roll)
 
-    def addRolltoBrand(self,brand,modelName):
+    def addRolltoBrand(self,brand,roll):
         brand = self.HashFunction(brand)
-        self.Hashtable[brand] = self.Appendroll(modelName)
+        self.Hashtable[brand] = roll
 
 
     def deleteRoll(self,brand,model):
