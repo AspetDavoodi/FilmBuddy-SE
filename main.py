@@ -2,6 +2,32 @@ import json as js
 
 # Brand, Model, ISO, type, usage, is_highend, is_color, is_inProduction
 
+class BST:
+
+    def __init__(self):
+        self.root = None
+
+
+    def insert(self,Node):
+        if self.root is None:
+            self.root = Node
+        else:
+            self.insert_Node(self.root, Node)
+
+    def insert_Node(self,current,Node):
+        if  current.ID < Node.ID:
+            if current.left:
+                self.insert_Node(current.left,Node)
+            else:
+                current.left = Node
+
+        elif current.ID > Node.ID:
+            if current.right:
+                self.insert_Node(current.right,Node)
+            else:
+                current.right = Node
+
+
 class LL:
 
     def __init__(self):
@@ -31,6 +57,7 @@ class RollManager:
         self.MaxNumberofBrands = 100
         self.Hashtable = [LL()] * self.MaxNumberofBrands
         self.brandlist = []
+        self.BST = BST()
 
     def HashFunction(self, key):
         hashedkey = 0
@@ -38,6 +65,7 @@ class RollManager:
             hashedkey = hashedkey + ord(i)
         hashedkey = hashedkey % self.MaxNumberofBrands
         return hashedkey
+
 
     def InsertBrand(self,key,value):
         hash_key = self.HashFunction(key)
@@ -52,6 +80,9 @@ class RollManager:
 
             for rollData in self.RollData[key]:
                 roll = Roll(key, rollData["model"], rollData["ISO"], rollData["type"], rollData["Usage"], rollData["is_HighEnd"], rollData["is_Color"], rollData["is_inProduction"])
+
+                roll.ID = roll.GenID()
+                self.BST.insert(roll)
 
                 self.addRolltoBrand(key,roll)
 
@@ -87,9 +118,9 @@ class RollManager:
             selectedRolls.extend(tmp)
 
         return (selectedRolls)
+
     def saveJSON(self):
         pass
-
 
 class Roll:
 
@@ -106,10 +137,28 @@ class Roll:
         self.next = None #Linked List implementation made more sense than tree or BST as most rolls have values that coincide
 
 
-    def set_next(self,Node):
+        self.ID = None    #for BST
+        self.left = None  #for BST
+        self.right = None #for BST
+
+    def PreorderList(self, currentroot, list):
+        if currentroot is not None:
+            list.append(currentroot.Model)
+            list = self.PreorderList(currentroot.left, list)
+            list = self.PreorderList(currentroot.right, list)
+        return list
+
+    def GenID(self):
+        self.ID = 0
+        for letter in self.Model:
+            self.ID = self.ID + ord(letter)
+        self.ID = self.ID % 1565
+        return self.ID
+
+    def set_next(self,Node): #for LL
         self.next = Node
 
-    def get_next(self):
+    def get_next(self): #for LL
         return self.next
 
     def toJSON(self):
@@ -123,7 +172,7 @@ class Roll:
             "is_inProduction": self.is_inProduction
         }
 
-        return
+        return #for saving JSON
 
     def is_equal(self,ISO, Highend,Color):
 
@@ -136,14 +185,17 @@ class Roll:
             else:
                 return False
         else: return False
+        #for searching in LL
+
+
+
+
 
 def main():
     rolls = RollManager()
     rolls.loadRollDataFromJSON()
-   # rolls.deleteRoll("Kodak","52145")
-   # print(rolls.findRoll(800,True,True))
-    brand = rolls.HashFunction('FujiColor')
-    print(rolls.Hashtable[brand].head.next.Model)
+    print(rolls.BST.root.PreorderList(rolls.BST.root,[])) #prints BST
+
 
 main()
 
